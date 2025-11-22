@@ -1,42 +1,66 @@
-# temp_app
+# SweepCRM
 
-An Electron application with React and TypeScript
+An Electron application with React and TypeScript for SweepCRM.
 
-## Recommended IDE Setup
+## Prerequisites
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- Node.js (>= 20) and npm
+- `prebuild-install` (installed via npm)
+- `electron-builder` (installed via npm)
+- No separate SQLite installation required; the native module bundles SQLite.
 
 ## Project Setup
 
 ### Install
 
 ```bash
-$ npm install
+npm install
 ```
 
-### Development
+### Environment
+
+Copy `.env.example` to `.env` if needed (contains DB password etc.).
+
+## Development
 
 ```bash
-$ npm run dev
+npm run dev
 ```
 
-### Preview Build (Local)
+Runs Electron with hot‑reloading.
 
-To run the built application (from `out/` directory) without packaging:
+## Build
 
 ```bash
-$ npm run start
+# Windows
+npm run build:win
+
+# macOS
+npm run build:mac
+
+# Linux
+npm run build:linux
 ```
 
-### Build
+The Windows build script downloads the pre‑built `better_sqlite3.node` binary for Windows, so you do **not** need to install SQLite separately.
+
+## Running the Packaged App
+
+After a build, run:
 
 ```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
+npm run start
 ```
+
+This launches the app from the `out/` directory.
+
+## Testing
+
+```bash
+npm run test          # unit tests
+npm run test:e2e      # Playwright end‑to‑end tests
+```
+
+## SQLite / Native Module
+
+The project uses `better-sqlite3-multiple-ciphers`, which includes the SQLite engine compiled for the target platform. The Windows build script (`scripts/build-win.js`) fetches the appropriate binary, so no external SQLite installation is required on any OS.
