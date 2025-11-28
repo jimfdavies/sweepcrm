@@ -1,0 +1,5 @@
+{"id":"sweepcrm-1t6","title":"Release: Verify Windows Build Artifacts","description":"","status":"open","priority":2,"issue_type":"task","created_at":"2025-11-28T15:47:05.702413Z","updated_at":"2025-11-28T15:47:05.702413Z"}
+{"id":"sweepcrm-dsc","title":"Documentation: Write Backup \u0026 Restore guide","description":"","status":"open","priority":2,"issue_type":"task","created_at":"2025-11-28T15:47:05.05994Z","updated_at":"2025-11-28T15:47:05.05994Z"}
+{"id":"sweepcrm-o7r","title":"Secure App Lifecycle: Lock database on window close","description":"","status":"open","priority":2,"issue_type":"task","created_at":"2025-11-28T15:47:04.270436Z","updated_at":"2025-11-28T15:47:04.270436Z"}
+{"id":"sweepcrm-pip","title":"UI Polish: Ensure high contrast and accessibility","description":"","status":"open","priority":2,"issue_type":"task","created_at":"2025-11-28T15:47:04.908309Z","updated_at":"2025-11-28T15:47:04.908309Z"}
+{"id":"sweepcrm-yfv","title":"QA: End-to-End Test of Reminder Logic","description":"","status":"open","priority":2,"issue_type":"task","created_at":"2025-11-28T15:47:05.811781Z","updated_at":"2025-11-28T15:47:05.811781Z"}

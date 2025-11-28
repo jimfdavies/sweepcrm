@@ -96,6 +96,8 @@ The system replaces a manual Excel-based workflow. It is designed for **offline,
 
 ## **6\. Development Roadmap**
 
+To expedite development, we will implement the database encryption towards the end of the development process. 
+
 1. **Scaffold:** Setup Electron \+ React \+ SQLite boilerplate.
 2. **Database:** Implement SQLCipher encryption and connection logic.
 3. **CRUD Features:** Build the forms for Customers, Properties, and Jobs.
