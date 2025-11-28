@@ -1,5 +1,5 @@
 import { ipcMain, dialog, app } from 'electron'
-import { is } from '@electron-toolkit/utils'
+// import { is } from '@electron-toolkit/utils'
 import { getDB, closeDB } from '../db/db'
 import fs from 'fs'
 import path from 'path'
@@ -216,7 +216,7 @@ export function setupIPC(): void {
 
       // In production, automatically restart the app
       // In dev mode, just return success and let user manually restart
-      if (!is.dev) {
+      if (app.isPackaged) {
         app.relaunch()
         app.exit(0)
       }
