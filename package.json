@@ -1,6 +1,6 @@
 {
   "name": "sweepcrm",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "An Electron application with React and TypeScript for SweepCRM.",
   "main": "electron/main.js",
   "build": {
@@ -19,7 +19,7 @@
     "dev": "vite",
     "electron": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
     "build": "vite build && electron-builder",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -43,11 +43,13 @@
     "tailwindcss": "^4.0.9"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^34.2.0",
     "electron-builder": "^25.1.8",
+    "playwright": "^1.57.0",
     "vite": "^6.2.0",
     "wait-on": "^8.0.2"
   }

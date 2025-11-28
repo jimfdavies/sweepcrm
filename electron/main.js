@@ -21,7 +21,14 @@ function createWindow() {
   }
 }
 
+const { initDatabase } = require('../src/database/db');
+
 app.whenReady().then(() => {
+  try {
+    initDatabase();
+  } catch (err) {
+    console.error('Failed to initialize database:', err);
+  }
   createWindow();
 
   app.on('activate', () => {
