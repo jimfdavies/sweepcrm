@@ -1,0 +1,54 @@
+{
+  "name": "sweepcrm",
+  "version": "1.0.0",
+  "description": "An Electron application with React and TypeScript for SweepCRM.",
+  "main": "electron/main.js",
+  "build": {
+    "appId": "com.sweepcrm.app",
+    "productName": "SweepCRM",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    }
+  },
+  "scripts": {
+    "start": "concurrently \"npm run dev\" \"npm run electron\"",
+    "dev": "vite",
+    "electron": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
+    "build": "vite build && electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jimfdavies/sweepcrm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jimfdavies/sweepcrm/issues"
+  },
+  "homepage": "https://github.com/jimfdavies/sweepcrm#readme",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "autoprefixer": "^10.4.20",
+    "better-sqlite3": "^11.8.1",
+    "postcss": "^8.5.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^6.2.0",
+    "wait-on": "^8.0.2"
+  }
+}
