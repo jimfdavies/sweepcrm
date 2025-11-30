@@ -58,8 +58,11 @@ app.whenReady().then(async () => {
     // IPC handler for database ping
     ipcMain.on('db-ping', (event) => {
       try {
-        getDb().pragma('journal_mode = WAL') // Simple query to ensure connection
-        event.returnValue = 'pong (db connected)'
+        const db = getDb()
+        const tables = db
+          .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+          .all()
+        event.returnValue = `Connected. Tables: ${tables.map((t) => t.name).join(', ')}`
       } catch (error) {
         console.error('Database ping failed:', error)
         event.returnValue = `error: ${(error as Error).message}`
@@ -71,7 +74,6 @@ app.whenReady().then(async () => {
     console.error('Failed to initialize application:', error)
     app.quit()
   }
-
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

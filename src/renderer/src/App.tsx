@@ -1,17 +1,8 @@
 import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
-import React, { useState, useEffect } from 'react'
 
 function App(): React.JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-  const [dbStatus, setDbStatus] = useState('Checking DB connection...')
-
-  useEffect(() => {
-    // Check DB status after component mounts
-    const status = window.api.db.ping()
-    console.log('DB Ping Status:', status) // Added for debugging
-    setDbStatus(status)
-  }, [])
 
   return (
     <>
@@ -35,10 +26,8 @@ function App(): React.JSX.Element {
             Send IPC
           </a>
         </div>
-        <div className="action">
-          DB Status: {dbStatus}
-        </div>
       </div>
+
       <Versions></Versions>
     </>
   )
