@@ -36,6 +36,7 @@ function createWindow(): void {
 }
 
 import { initializeDatabase, closeDatabase, getDb } from './database'
+import { registerIpcHandlers } from './ipc'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -54,6 +55,7 @@ app.whenReady().then(async () => {
   try {
     // Initialize the database before creating the window
     await initializeDatabase()
+    registerIpcHandlers()
 
     // IPC handler for database ping
     ipcMain.on('db-ping', (event) => {

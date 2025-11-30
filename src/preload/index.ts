@@ -5,7 +5,9 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   db: {
     ping: (): string => ipcRenderer.sendSync('db-ping')
-  }
+  },
+  createCustomer: (customer: unknown): Promise<unknown> =>
+    ipcRenderer.invoke('create-customer', customer)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

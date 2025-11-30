@@ -1,8 +1,16 @@
+import { useState } from 'react'
 import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
+import AddCustomerPage from './pages/AddCustomerPage'
 
 function App(): React.JSX.Element {
+  const [currentPage, setCurrentPage] = useState<string>('home')
+
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+
+  if (currentPage === 'add-customer') {
+    return <AddCustomerPage onBack={() => setCurrentPage('home')} />
+  }
 
   return (
     <>
@@ -25,6 +33,9 @@ function App(): React.JSX.Element {
           <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
             Send IPC
           </a>
+        </div>
+        <div className="action">
+          <button onClick={() => setCurrentPage('add-customer')}>Add Customer</button>
         </div>
       </div>
 
