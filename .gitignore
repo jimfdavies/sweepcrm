@@ -1,3 +1,6 @@
 node_modules
-release/
-dist/
+dist
+out
+.DS_Store
+.eslintcache
+*.log*
