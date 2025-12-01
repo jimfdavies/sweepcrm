@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@playwright/mcp": "^0.0.49",
     "better-sqlite3": "^12.5.0"
   },
   "devDependencies": {
