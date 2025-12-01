@@ -7,7 +7,7 @@ function AddCustomerPage({ onBack }: { onBack: () => void }): React.JSX.Element 
       <button onClick={onBack} className="back-button">
         &larr; Back
       </button>
-      <CustomerForm />
+      <CustomerForm onSuccess={onBack} />
     </div>
   )
 }

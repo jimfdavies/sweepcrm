@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import { app } from 'electron'
 import path from 'path'
+import { Customer, CustomerDBRow } from '../shared/types'
 
 let db: Database.Database | null = null
 
@@ -166,6 +167,63 @@ export function getDb(): Database.Database {
   return db
 }
 
+export function getCustomerById(id: number): CustomerDBRow | null {
+  if (!db) {
+    throw new Error('Database not initialized.')
+  }
+  const row = db.prepare('SELECT * FROM customers WHERE id = ?').get(id) as
+    | CustomerDBRow
+    | undefined
+  return row || null
+}
+
+interface DBOperationResult {
+  success: boolean
+  changes?: number
+  error?: string
+}
+
+export function updateCustomer(customer: Customer): DBOperationResult {
+  if (!db) {
+    throw new Error('Database not initialized.')
+  }
+  if (!customer.id) {
+    return { success: false, error: 'Customer ID is required for update.' }
+  }
+
+  try {
+    const stmt = db.prepare(`
+      UPDATE customers
+      SET first_name = @first_name,
+          last_name = @last_name,
+          email = @email,
+          phone = @phone,
+          notes = @notes,
+                title = @title,
+                      updated_at = CURRENT_TIMESTAMP
+                WHERE id = @id
+              `)
+          
+              const nameParts = customer.name.split(' ')
+              const firstName = nameParts[0] || ''
+              const lastName = nameParts.slice(1).join(' ') || ''
+          
+              const info = stmt.run({
+                id: customer.id,
+                first_name: firstName,
+                last_name: lastName,
+                email: customer.email,
+                phone: customer.phone,
+                notes: customer.address, // Address is stored in notes
+                title: '' // Default title since it's not in Customer interface
+              })
+          
+              return { success: true, changes: info.changes }
+            } catch (error) {
+              console.error('Error updating customer in database:', error)
+              return { success: false, error: (error as Error).message }
+            }
+          }
 export function closeDatabase(): void {
   if (db) {
     db.close()

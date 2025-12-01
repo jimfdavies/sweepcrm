@@ -2,14 +2,25 @@ import { useState } from 'react'
 import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
 import AddCustomerPage from './pages/AddCustomerPage'
+import EditCustomerPage from './pages/EditCustomerPage'
 
 function App(): React.JSX.Element {
   const [currentPage, setCurrentPage] = useState<string>('home')
+  const [editingCustomerId, setEditingCustomerId] = useState<number | null>(null)
 
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
+  const handleBackToHome = (): void => {
+    setCurrentPage('home')
+    setEditingCustomerId(null)
+  }
+
   if (currentPage === 'add-customer') {
-    return <AddCustomerPage onBack={() => setCurrentPage('home')} />
+    return <AddCustomerPage onBack={handleBackToHome} />
+  }
+
+  if (currentPage === 'edit-customer' && editingCustomerId !== null) {
+    return <EditCustomerPage customerId={editingCustomerId} onBack={handleBackToHome} />
   }
 
   return (
@@ -36,6 +47,16 @@ function App(): React.JSX.Element {
         </div>
         <div className="action">
           <button onClick={() => setCurrentPage('add-customer')}>Add Customer</button>
+        </div>
+        <div className="action">
+          <button
+            onClick={() => {
+              setCurrentPage('edit-customer')
+              setEditingCustomerId(1) // Hardcoded ID for testing
+            }}
+          >
+            Edit Customer (ID 1)
+          </button>
         </div>
       </div>
 

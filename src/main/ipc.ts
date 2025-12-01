@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
-import { getDb } from './database'
-import { CreateCustomerDTO } from '../shared/types'
+import { getDb, getCustomerById, updateCustomer } from './database'
+import { CreateCustomerDTO, Customer, CustomerDBRow } from '../shared/types'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('create-customer', async (_, customer: CreateCustomerDTO) => {
@@ -28,6 +28,42 @@ export function registerIpcHandlers(): void {
       return { success: true, id: info.lastInsertRowid }
     } catch (error) {
       console.error('Failed to create customer:', error)
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  ipcMain.handle('get-customer-by-id', async (_, id: number) => {
+    try {
+      const row: CustomerDBRow | null = getCustomerById(id)
+      if (!row) {
+        return null
+      }
+      // Map database row to Customer interface, handling name splitting and address from notes
+      const customer: Customer = {
+        id: row.id,
+        name: `${row.first_name} ${row.last_name}`.trim(),
+        email: row.email,
+        phone: row.phone,
+        address: row.notes || '', // Address is stored in notes
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }
+      return customer
+    } catch (error) {
+      console.error(`Failed to get customer with id ${id}:`, error)
+      return null
+    }
+  })
+
+  ipcMain.handle('update-customer', async (_, customer: Customer) => {
+    try {
+      if (!customer.id) {
+        throw new Error('Customer ID is required for update.')
+      }
+      const result = updateCustomer(customer)
+      return result
+    } catch (error) {
+      console.error('Failed to update customer:', error)
       return { success: false, error: (error as Error).message }
     }
   })
