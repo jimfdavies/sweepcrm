@@ -28,10 +28,27 @@ function createWindow(): void {
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
+  console.log('is.dev:', is.dev, 'ELECTRON_RENDERER_URL:', process.env['ELECTRON_RENDERER_URL'], '__dirname:', __dirname)
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    console.log('Loading dev renderer from URL:', process.env['ELECTRON_RENDERER_URL'])
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    // In production, load from the built renderer directory
+    const rendererPath = join(__dirname, '../renderer/index.html')
+    console.log('Loading production renderer from file:', rendererPath)
+    try {
+      const fs = require('fs')
+      if (fs.existsSync(rendererPath)) {
+        console.log('File exists, loading...')
+        mainWindow.loadFile(rendererPath)
+      } else {
+        console.log('File does NOT exist at:', rendererPath)
+        mainWindow.loadFile(rendererPath) // Try to load anyway, will show error
+      }
+    } catch (e) {
+      console.log('Error checking file:', e)
+      mainWindow.loadFile(rendererPath)
+    }
   }
 }
 
