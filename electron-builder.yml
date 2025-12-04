@@ -1,0 +1,35 @@
+appId: com.sweepcrm.app
+productName: SweepCRM
+asar: true
+
+files:
+  - out/main/**/*
+  - out/preload/**/*
+  - out/renderer/**/*
+
+directories:
+  out: out
+  buildResources: resources
+
+win:
+  target:
+    - nsis
+    - portable
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.business
+
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Office

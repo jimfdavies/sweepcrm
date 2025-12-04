@@ -142,3 +142,171 @@ history/
 - ❌ Do NOT clutter repo root with planning documents
 
 For more details, see README.md and QUICKSTART.md.
+
+---
+
+## Testing with Playwright + Electron
+
+**CRITICAL**: Tests are your visual verification tool. Always run tests after implementing features to verify UI works correctly.
+
+### Quick Start
+
+```bash
+# Build and run all tests (screenshots on failure)
+npm run test:e2e
+
+# Run with interactive UI (Playwright Inspector)
+npm run test:e2e:ui
+
+# Debug with DevTools
+npm run test:e2e:debug
+```
+
+### When to Run Tests
+
+1. **After implementing a new feature** - Verify it works and take screenshots
+2. **Before closing a task** - Tests must pass before `bd close`
+3. **After modifying UI** - Check that changes render correctly
+4. **When debugging** - Use `npm run test:e2e:ui` to step through actions
+
+### Writing Tests
+
+All tests use the `electron-app.fixture`:
+
+```typescript
+import { test, expect } from './fixtures/electron-app.fixture'
+
+test('customer form works', async ({ window }) => {
+  // Click to open form
+  await window.click('button:has-text("Add Customer")')
+
+  // Fill inputs
+  await window.fill('input[name="firstName"]', 'John')
+  await window.fill('input[name="lastName"]', 'Smith')
+
+  // Submit and verify
+  await window.click('button:has-text("Save")')
+  await expect(window.locator('.success-message')).toBeVisible()
+
+  // Screenshot for visual verification
+  await window.screenshot({ path: 'tests/screenshots/customer-added.png' })
+})
+```
+
+**Key APIs:**
+
+| Method | Purpose |
+|--------|---------|
+| `window.click(selector)` | Click an element |
+| `window.fill(selector, text)` | Fill input/textarea |
+| `window.locator(selector)` | Get element reference |
+| `window.screenshot({ path })` | Capture visual state |
+| `await expect(...)` | Assert conditions |
+| `electronApp.evaluate(fn)` | Run code in main process |
+
+### Test File Structure
+
+```
+tests/
+├── app.spec.ts                    # Basic app launch tests
+├── features/
+│   ├── customers.spec.ts          # Customer management tests
+│   ├── properties.spec.ts         # Property management tests
+│   └── jobs.spec.ts               # Job logging tests
+├── fixtures/
+│   └── electron-app.fixture.ts    # Reusable Electron fixture
+└── screenshots/                   # Auto-captured screenshots
+    └── app-launch.png
+```
+
+### Debugging Tests
+
+**View test results:**
+```bash
+npx playwright show-report
+# Opens HTML report with videos, traces, screenshots
+```
+
+**Inspect console output:**
+Tests automatically log:
+- `[Electron Main]` - Main process console
+- `[Renderer]` - Renderer console
+- `[Renderer Error]` - JavaScript errors
+
+**Find screenshots on failure:**
+```bash
+ls -la tests/screenshots/
+# Auto-captured on test failure
+```
+
+**Step through test interactively:**
+```bash
+npm run test:e2e:ui
+# Click "Step over" in Playwright Inspector
+# See live DOM, console, values
+```
+
+### CI/CD Integration
+
+Tests are configured to:
+- ✅ Run with single worker in CI (no race conditions)
+- ✅ Capture screenshots on failure
+- ✅ Record videos on failure
+- ✅ Save traces for debugging
+- ✅ Auto-build before running (no manual npm run build needed)
+
+### Important Rules
+
+- ✅ Always run `npm run test:e2e` after feature implementation
+- ✅ Keep tests focused and single-concern
+- ✅ Use semantic selectors (`text=` helpers)
+- ✅ Screenshot new features for visual verification
+- ✅ Only close issue after tests pass
+- ❌ Do NOT ignore failing tests
+- ❌ Do NOT skip E2E tests for UI changes
+- ❌ Do NOT use brittle CSS class selectors
+
+### Fixture Pattern
+
+All tests use this pattern:
+
+```typescript
+test('my test', async ({ electronApp, window }) => {
+  // electronApp: ElectronApplication - full main process access
+  // window: Page - first BrowserWindow as Playwright Page
+
+  // Test setup
+  const result = await electronApp.evaluate(async ({ app }) => {
+    return app.isPackaged
+  })
+
+  // UI interaction
+  await window.click('button')
+  const text = await window.textContent('h1')
+
+  // Assertion
+  expect(text).toContain('SweepCRM')
+
+  // Visual verification
+  await window.screenshot({ path: 'tests/screenshots/feature.png' })
+})
+```
+
+Fixture automatically:
+- ✅ Launches app before test
+- ✅ Waits for first window
+- ✅ Logs console messages
+- ✅ Cleans up after test
+- ✅ Closes app gracefully
+
+### Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Tests hang | Check `npm run build` succeeded. Increase timeout in playwright.config.ts |
+| App won't launch | Verify `./out/main/index.js` exists. Run `npm run build` first |
+| Selector not found | Use `npm run test:e2e:ui` to inspect DOM. Check element exists |
+| Screenshot is blank | Add `await window.waitForLoadState('networkidle')` before screenshot |
+| IPC calls fail | Verify preload script loaded. Check main process handlers exist |
+
+See `history/TESTING_GUIDE.md` for detailed testing documentation.
