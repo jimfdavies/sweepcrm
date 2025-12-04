@@ -7,7 +7,11 @@ const api = {
     ping: (): string => ipcRenderer.sendSync('db-ping')
   },
   createCustomer: (customer: unknown): Promise<unknown> =>
-    ipcRenderer.invoke('create-customer', customer)
+    ipcRenderer.invoke('create-customer', customer),
+  getCustomerById: (id: number): Promise<unknown> =>
+    ipcRenderer.invoke('get-customer-by-id', id),
+  updateCustomer: (customer: unknown): Promise<unknown> =>
+    ipcRenderer.invoke('update-customer', customer)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

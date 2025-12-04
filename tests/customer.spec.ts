@@ -1,54 +1,50 @@
 import { _electron as electron, test, expect, ElectronApplication, Page } from '@playwright/test'
 import path from 'path'
 import fs from 'fs'
-import { exec } from 'child_process'
 
 let electronApp: ElectronApplication
 let page: Page
-let devProcess
 
 test.beforeAll(async () => {
-  // Start the dev server in the background
-  devProcess = exec('npm run dev', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`)
-      return
-    }
-    console.log(`stdout: ${stdout}`)
-    console.error(`stderr: ${stderr}`)
-  })
-
-  // Wait for the dev server to be ready
-  await new Promise((resolve) => setTimeout(resolve, 15000)) // 15-second wait for server to start
-
   electronApp = await electron.launch({
-    args: ['.'],
-    env: { ...process.env, NODE_ENV: 'development' }
+    env: { ...process.env, NODE_ENV: 'production' }
   })
 
   page = await electronApp.firstWindow()
-  await page.goto('http://localhost:5173') // Navigate to the Vite dev server URL
   await page.waitForLoadState('domcontentloaded')
+  
+  // Wait additional time for React to render
+  await page.waitForTimeout(3000)
 
   // Create screenshots directory if it doesn't exist
   const screenshotDir = path.join(__dirname, 'screenshots')
   if (!fs.existsSync(screenshotDir)) {
     fs.mkdirSync(screenshotDir)
   }
+  
+  console.log('Page HTML:', await page.content())
   await page.screenshot({ path: path.join(screenshotDir, 'initial-load-after-dev.png') })
 }, 60000)
 
 test.afterAll(async () => {
   await electronApp.close()
-  if (devProcess) {
-    devProcess.kill()
-  }
 })
 
 test.describe('Customer Management', () => {
   test.setTimeout(30000)
   test('should navigate to Add Customer page and create a new customer', async () => {
-    await page.click('button:has-text("Add Customer")')
+    // Wait for the page to be fully interactive
+    await page.waitForTimeout(2000)
+    
+    // Log page content for debugging
+    const buttons = await page.locator('button').all()
+    console.log(`Found ${buttons.length} buttons on page`)
+    
+    // Wait for Add Customer button to be visible and enabled
+    const addBtn = page.locator('button:has-text("Add Customer")')
+    await addBtn.waitFor({ state: 'visible', timeout: 10000 })
+    await addBtn.click()
+    
     await expect(page.locator('h2')).toHaveText('Add New Customer')
 
     await page.fill('input[name="name"]', 'Test Customer 1')

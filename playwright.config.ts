@@ -15,5 +15,12 @@ export default defineConfig({
         // We will launch the app manually in the test
       }
     }
-  ]
+  ],
+  connectOptions: {
+    wsEndpoint: 'ws://127.0.0.1:9223/ws',
+    headers: {
+      'x-mcp-token': 'your-mcp-token'
+    },
+    timeout: 10000
+  }
 })
