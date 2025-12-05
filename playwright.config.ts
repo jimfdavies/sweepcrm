@@ -33,6 +33,11 @@ export default defineConfig({
     timeout: 5000
   },
 
+  // Set environment variable to signal test mode to the app
+  env: {
+    PLAYWRIGHT_TEST: 'true'
+  },
+
   // Global settings
   use: {
     // Screenshot/video settings for visual debugging

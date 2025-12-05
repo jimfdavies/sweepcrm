@@ -30,7 +30,11 @@ export const test = base.extend<ElectronAppFixtures>({
     try {
       electronApp = await electron.launch({
         args: [appMainPath],
-        timeout: 30000
+        timeout: 30000,
+        env: {
+          ...process.env,
+          PLAYWRIGHT_TEST: 'true'
+        }
       })
 
       // Setup console logging from main process

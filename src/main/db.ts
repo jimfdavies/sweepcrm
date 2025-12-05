@@ -8,9 +8,15 @@ let db: Database.Database | null = null
 
 /**
  * Get the database file path
+ * Uses different app names for dev vs test to keep databases separate
  */
 const getDbPath = (): string => {
-  const appData = app.getPath('userData')
+  const isPlaywrightTest = process.env.PLAYWRIGHT_TEST === 'true'
+  const appName = isPlaywrightTest ? 'SweepCRM-Test' : 'SweepCRM'
+  
+  // Use explicit path construction instead of app.getPath('userData')
+  // to ensure consistent app name regardless of how Electron is launched
+  const appData = join(app.getPath('home'), 'Library', 'Application Support', appName)
   const dbDir = join(appData, 'db')
 
   // Create directory if it doesn't exist
