@@ -59,9 +59,14 @@ bd close bd-42 --reason "Completed" --json
 2. **Claim your task**: `bd update <id> --status in_progress`
 3. **Work on it**: Implement, test, document
 4. **Discover new work?** Create linked issue:
-   - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
-6. **Commit together**: Always commit the `.beads/issues.jsonl` file together with the code changes so issue state stays in sync with code state
+    - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
+5. **Before closing**: ALWAYS ask user for manual testing approval:
+    - Tell user what to look for (specific UI elements, interactions, edge cases)
+    - Ask them to test the feature using `npm run test:e2e:ui`
+    - Wait for feedback/approval before closing the issue
+    - Update issue close reason with user feedback
+6. **Complete**: `bd close <id> --reason "Done + user feedback"`
+7. **Commit together**: Always commit the `.beads/issues.jsonl` file together with the code changes so issue state stays in sync with code state
 
 ### Auto-Sync
 
