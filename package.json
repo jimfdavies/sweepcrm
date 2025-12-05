@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "electron-rebuild",
-    "dev": "electron-vite dev",
+    "uat": "electron-vite dev",
     "build": "npm run type-check && electron-vite build",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",

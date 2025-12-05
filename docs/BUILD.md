@@ -9,13 +9,13 @@ This document describes how to build SweepCRM for different platforms.
 - For macOS builds: Xcode Command Line Tools
 - For Linux builds: GCC and other build tools
 
-## Building for Development
+## User Acceptance Testing (UAT)
 
 ```bash
-npm run dev
+npm run uat
 ```
 
-Starts the app in development mode with hot reload.
+Starts the app in development mode with hot reload. Uses the local SweepCRM database for manual testing.
 
 ## Building for Production
 
