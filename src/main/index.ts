@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { is, platform } from '@electron-toolkit/utils'
 import { registerIPCHandler } from './ipc'
-import { initializeDatabase, handleDatabaseRequest } from './db'
+import { initializeDatabase, handleDatabaseRequest, closeDatabase } from './db'
 import { DatabaseRequest } from '../shared/ipc.types'
 
 let mainWindow: BrowserWindow | null = null
@@ -32,14 +32,17 @@ const createWindow = (): void => {
 }
 
 app.on('ready', () => {
-  registerIPCHandler<DatabaseRequest>('db:request', handleDatabaseRequest)
-  initializeDatabase().catch(error => {
+  try {
+    initializeDatabase()
+  } catch (error) {
     console.error('[DB Init] Failed:', error)
-  })
+  }
+  registerIPCHandler<DatabaseRequest>('db:request', handleDatabaseRequest)
   createWindow()
 })
 
 app.on('window-all-closed', () => {
+  closeDatabase()
   if (!platform.isMacOS) {
     app.quit()
   }

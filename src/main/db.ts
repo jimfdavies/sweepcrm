@@ -1,24 +1,43 @@
-import initSqlJs, { Database } from 'sql.js'
+import Database from 'better-sqlite3'
+import { join } from 'path'
+import { app } from 'electron'
+import { existsSync, mkdirSync } from 'fs'
 import { DatabaseRequest, DatabaseResponse } from '../shared/ipc.types'
 
-let db: Database | null = null
+let db: Database.Database | null = null
+
+/**
+ * Get the database file path
+ */
+const getDbPath = (): string => {
+  const appData = app.getPath('userData')
+  const dbDir = join(appData, 'db')
+
+  // Create directory if it doesn't exist
+  if (!existsSync(dbDir)) {
+    mkdirSync(dbDir, { recursive: true })
+  }
+
+  return join(dbDir, 'sweepcrm.db')
+}
 
 /**
  * Initialize the SQLite database
  */
-export const initializeDatabase = async (): Promise<void> => {
+export const initializeDatabase = (): void => {
   try {
-    const SQL = await initSqlJs({
-      locateFile: (file: string) => `https://sql.js.org/dist/${file}`
-    })
-    db = new SQL.Database()
+    const dbPath = getDbPath()
+    db = new Database(dbPath)
+
+    // Enable foreign keys
+    db.pragma('foreign_keys = ON')
 
     // Create tables
     createTables()
-    console.log('[DB] Database initialized')
+    console.log('[DB] Database initialized at', dbPath)
   } catch (error) {
     console.error('[DB] Failed to initialize database:', error)
-    // Don't throw - let the app start anyway
+    throw error
   }
 }
 
@@ -29,7 +48,7 @@ const createTables = (): void => {
   if (!db) throw new Error('Database not initialized')
 
   // Customers table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS customers (
       id TEXT PRIMARY KEY,
       firstName TEXT NOT NULL,
@@ -44,7 +63,7 @@ const createTables = (): void => {
   `)
 
   // Properties table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS properties (
       id TEXT PRIMARY KEY,
       customerId TEXT NOT NULL,
@@ -55,12 +74,12 @@ const createTables = (): void => {
       notes TEXT,
       createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
       updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (customerId) REFERENCES customers(id)
+      FOREIGN KEY (customerId) REFERENCES customers(id) ON DELETE CASCADE
     )
   `)
 
   // Service logs table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS serviceLogs (
       id TEXT PRIMARY KEY,
       propertyId TEXT NOT NULL,
@@ -70,7 +89,7 @@ const createTables = (): void => {
       notes TEXT,
       createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
       updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (propertyId) REFERENCES properties(id)
+      FOREIGN KEY (propertyId) REFERENCES properties(id) ON DELETE CASCADE
     )
   `)
 }
@@ -78,7 +97,7 @@ const createTables = (): void => {
 /**
  * Handle database requests
  */
-export const handleDatabaseRequest = async (request: DatabaseRequest): Promise<DatabaseResponse> => {
+export const handleDatabaseRequest = (request: DatabaseRequest): DatabaseResponse => {
   if (!db) {
     return {
       success: false,
@@ -119,17 +138,17 @@ const handleCreate = (request: DatabaseRequest): DatabaseResponse => {
   }
 
   const { table, data } = request
-  const columns = Object.keys(data).join(', ')
-  const values = Object.values(data).map(v => (typeof v === 'boolean' ? (v ? 1 : 0) : v)) as (
-    | string
-    | number
-    | Uint8Array
-    | null
-  )[]
-  const placeholders = values.map(() => '?').join(', ')
+  const columns = Object.keys(data)
+  const placeholders = columns.map(() => '?').join(', ')
+  const values = Object.values(data)
 
-  db.run(`INSERT INTO ${table} (${columns}) VALUES (${placeholders})`, values)
-  return { success: true, data: { id: data.id } }
+  try {
+    const stmt = db.prepare(`INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`)
+    stmt.run(...values)
+    return { success: true, data: { id: data.id } }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Insert failed' }
+  }
 }
 
 const handleRead = (request: DatabaseRequest): DatabaseResponse => {
@@ -138,17 +157,19 @@ const handleRead = (request: DatabaseRequest): DatabaseResponse => {
   }
 
   const { table, id } = request
-  const stmt = db.prepare(`SELECT * FROM ${table} WHERE id = ?`)
-  stmt.bind([id])
 
-  if (stmt.step()) {
-    const row = stmt.getAsObject()
-    stmt.free()
+  try {
+    const stmt = db.prepare(`SELECT * FROM ${table} WHERE id = ?`)
+    const row = stmt.get(id) as Record<string, unknown>
+
+    if (!row) {
+      return { success: false, error: 'Not found' }
+    }
+
     return { success: true, data: row }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Read failed' }
   }
-
-  stmt.free()
-  return { success: false, error: 'Not found' }
 }
 
 const handleUpdate = (request: DatabaseRequest): DatabaseResponse => {
@@ -161,10 +182,14 @@ const handleUpdate = (request: DatabaseRequest): DatabaseResponse => {
     .map(key => `${key} = ?`)
     .join(', ')
   const values = [...Object.values(data), id]
-    .map(v => (typeof v === 'boolean' ? (v ? 1 : 0) : v)) as (string | number | Uint8Array | null)[]
 
-  db.run(`UPDATE ${table} SET ${updates} WHERE id = ?`, values)
-  return { success: true, data: { id } }
+  try {
+    const stmt = db.prepare(`UPDATE ${table} SET ${updates} WHERE id = ?`)
+    stmt.run(...values)
+    return { success: true, data: { id } }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Update failed' }
+  }
 }
 
 const handleDelete = (request: DatabaseRequest): DatabaseResponse => {
@@ -173,8 +198,14 @@ const handleDelete = (request: DatabaseRequest): DatabaseResponse => {
   }
 
   const { table, id } = request
-  db.run(`DELETE FROM ${table} WHERE id = ?`, [id])
-  return { success: true }
+
+  try {
+    const stmt = db.prepare(`DELETE FROM ${table} WHERE id = ?`)
+    stmt.run(id)
+    return { success: true }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Delete failed' }
+  }
 }
 
 const handleList = (request: DatabaseRequest): DatabaseResponse => {
@@ -184,28 +215,52 @@ const handleList = (request: DatabaseRequest): DatabaseResponse => {
 
   const { table, filters } = request
   let query = `SELECT * FROM ${table}`
-  const values: (string | number | Uint8Array | null)[] = []
+  const values: unknown[] = []
 
   if (filters) {
     const whereClause = Object.keys(filters)
       .map(key => {
-        const val = filters[key]
-        const sqlVal = typeof val === 'boolean' ? (val ? 1 : 0) : val
-        values.push(sqlVal as string | number | Uint8Array | null)
+        values.push(filters[key])
         return `${key} = ?`
       })
       .join(' AND ')
     query += ` WHERE ${whereClause}`
   }
 
-  const stmt = db.prepare(query)
-  stmt.bind(values)
-
-  const results = []
-  while (stmt.step()) {
-    results.push(stmt.getAsObject())
+  try {
+    const stmt = db.prepare(query)
+    const results = stmt.all(...values) as Record<string, unknown>[]
+    return { success: true, data: results }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'List failed' }
   }
-  stmt.free()
+}
 
-  return { success: true, data: results }
+/**
+ * Close the database connection
+ */
+export const closeDatabase = (): void => {
+  if (db) {
+    db.close()
+    db = null
+    console.log('[DB] Database closed')
+  }
+}
+
+/**
+ * Reset the database (for testing)
+ */
+export const resetDatabase = (): void => {
+  try {
+    if (db) {
+      db.exec('DELETE FROM serviceLogs')
+      db.exec('DELETE FROM properties')
+      db.exec('DELETE FROM customers')
+    }
+    console.log('[DB] Database reset')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('[DB] Error resetting database:', error)
+    }
+  }
 }

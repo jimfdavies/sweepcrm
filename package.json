@@ -21,7 +21,8 @@
     "test:ui": "playwright test --ui"
   },
   "dependencies": {
-    "sql.js": "^1.8.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.5.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -33,7 +34,6 @@
     "@types/node": "^20.19.25",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "@types/sql.js": "^1.4.9",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.2.0",
