@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { listRecords } from '../services/db'
 import JobForm from './JobForm'
+import JobEditForm from './JobEditForm'
 
 interface Customer {
   id: string
@@ -43,6 +44,7 @@ export default function Jobs() {
   const [error, setError] = useState<string | null>(null)
   const [customerSearchQuery, setCustomerSearchQuery] = useState('')
   const [showJobForm, setShowJobForm] = useState(false)
+  const [editingJobId, setEditingJobId] = useState<string | null>(null)
 
   useEffect(() => {
     loadCustomers()
@@ -273,7 +275,12 @@ export default function Jobs() {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">{job.notes || '-'}</td>
                       <td className="px-4 py-3 text-sm">
-                        <button className="text-blue-600 hover:text-blue-800 font-medium mr-3">Edit</button>
+                        <button
+                          onClick={() => setEditingJobId(job.id)}
+                          className="text-blue-600 hover:text-blue-800 font-medium mr-3"
+                        >
+                          Edit
+                        </button>
                         <button className="text-red-600 hover:text-red-800 font-medium">Delete</button>
                       </td>
                     </tr>
@@ -294,6 +301,18 @@ export default function Jobs() {
             loadJobs()
           }}
           onCancel={() => setShowJobForm(false)}
+        />
+      )}
+
+      {/* Job Edit Form Modal */}
+      {editingJobId && (
+        <JobEditForm
+          jobId={editingJobId}
+          onSave={() => {
+            setEditingJobId(null)
+            loadJobs()
+          }}
+          onCancel={() => setEditingJobId(null)}
         />
       )}
     </div>

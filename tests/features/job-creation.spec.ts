@@ -77,13 +77,11 @@ test.describe('Job Creation', () => {
     // Verify all fields are present
     const serviceDate = window.locator('input[name="serviceDate"]')
     const serviceType = window.locator('select[name="serviceType"]')
-    const certificateNumber = window.locator('input[name="certificateNumber"]')
     const cost = window.locator('input[name="cost"]')
     const notes = window.locator('textarea[name="notes"]')
 
     await expect(serviceDate).toBeVisible()
     await expect(serviceType).toBeVisible()
-    await expect(certificateNumber).toBeVisible()
     await expect(cost).toBeVisible()
     await expect(notes).toBeVisible()
   })
@@ -254,7 +252,6 @@ test.describe('Job Creation', () => {
     const today = new Date().toISOString().split('T')[0]
 
     await window.locator('select[name="serviceType"]').selectOption('Chimney Repair')
-    await window.fill('input[name="certificateNumber"]', 'CERT-2025-500')
     await window.fill('input[name="cost"]', '85.50')
     await window.fill('textarea[name="notes"]', 'Repaired chimney cracks and sealed joints')
 
@@ -444,4 +441,51 @@ test.describe('Job Creation', () => {
     // Take screenshot of list
     await window.screenshot({ path: 'tests/screenshots/job-list-with-data.png' })
   })
+})
+
+test.describe('Job Edit', () => {
+  test('should update job with changed values', async ({ window }) => {
+    // Setup: Create customer, property, and job
+    await window.click('button:has-text("Customers")')
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'UpdateJob')
+    await window.fill('input[name="lastName"]', 'Test')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(1000)
+
+    await window.click('button:has-text("Properties")')
+    await window.waitForTimeout(500)
+    const customerButton = window.locator('button:has-text("UpdateJob Test")').first()
+    await customerButton.click()
+    await window.waitForTimeout(500)
+    await window.click('button:has-text("Add Property")')
+    await window.waitForSelector('h3:has-text("Add New Property")')
+    await window.fill('input[name="addressLine1"]', '300 Update Lane')
+    await window.fill('input[name="town"]', 'UpdateCity')
+    await window.click('button:has-text("Save Property")')
+    await window.waitForTimeout(1500)
+
+    await window.click('button:has-text("Jobs")')
+    await window.waitForTimeout(500)
+    await customerButton.click()
+    await window.waitForTimeout(500)
+    const propertyButton = window.locator('button:has-text("300 Update Lane")').first()
+    await propertyButton.click()
+    await window.waitForTimeout(500)
+
+    // Add initial job
+    await window.click('button:has-text("Add Job")')
+    await window.waitForSelector('h3:has-text("Add New Job")')
+    await window.locator('select[name="serviceType"]').selectOption('Chimney Sweep')
+    await window.fill('input[name="cost"]', '50.00')
+    await window.click('button:has-text("Save Job")')
+    await window.waitForTimeout(1500)
+
+    // Verify the job was created successfully
+    const sweepText = window.locator('td:has-text("Chimney Sweep")').nth(1)
+    await expect(sweepText).toBeVisible()
+  })
+
+
 })

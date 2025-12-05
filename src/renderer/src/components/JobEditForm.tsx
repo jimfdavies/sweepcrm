@@ -1,31 +1,58 @@
-import { useState } from 'react'
-import { createRecord } from '../services/db'
+import { useState, useEffect } from 'react'
+import { readRecord, updateRecord } from '../services/db'
 
-// Simple UUID v4 generator (minimal implementation)
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
+interface ServiceLog {
+  id: string
+  propertyId: string
+  serviceType: string
+  serviceDate: string
+  cost?: number
+  notes?: string
+  createdAt: string
+  updatedAt: string
+  certificateNumber?: string
 }
 
-interface JobFormProps {
-  propertyId: string
+interface JobEditFormProps {
+  jobId: string
   onSave: () => void
   onCancel: () => void
 }
 
-export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) {
+export default function JobEditForm({ jobId, onSave, onCancel }: JobEditFormProps) {
   const [formData, setFormData] = useState({
-    serviceDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+    serviceDate: '',
     serviceType: '',
     cost: '',
     notes: ''
   })
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [saveLoading, setSaveLoading] = useState(false)
+
+  useEffect(() => {
+    loadJob()
+  }, [jobId])
+
+  const loadJob = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const job = await readRecord<ServiceLog>('serviceLogs', jobId)
+      setFormData({
+        serviceDate: job.serviceDate,
+        serviceType: job.serviceType,
+        cost: job.cost ? job.cost.toString() : '',
+        notes: job.notes || ''
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load job')
+      console.error('Error loading job:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -50,17 +77,14 @@ export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) 
     }
 
     try {
-      setLoading(true)
+      setSaveLoading(true)
       setError(null)
 
-      // Create job object
-      const jobId = generateUUID()
-      const newJob: Record<string, unknown> & { id: string } = {
+      // Create job object for update
+      const updatedJob: Record<string, unknown> & { id: string } = {
         id: jobId,
-        propertyId,
         serviceDate: formData.serviceDate,
         serviceType: formData.serviceType,
-        createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
 
@@ -68,25 +92,35 @@ export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) 
       if (formData.cost?.trim()) {
         const costValue = parseFloat(formData.cost)
         if (!isNaN(costValue)) {
-          newJob.cost = costValue
+          updatedJob.cost = costValue
         }
       }
-      if (formData.notes?.trim()) newJob.notes = formData.notes
+      if (formData.notes?.trim()) updatedJob.notes = formData.notes
 
-      await createRecord('serviceLogs', newJob)
+      await updateRecord('serviceLogs', updatedJob)
       onSave()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save job')
       console.error('Error saving job:', err)
     } finally {
-      setLoading(false)
+      setSaveLoading(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+          <p className="text-gray-600">Loading job...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">Add New Job</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Edit Job</h3>
 
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
@@ -178,17 +212,17 @@ export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) 
             <button
               type="button"
               onClick={onCancel}
-              disabled={loading}
+              disabled={saveLoading}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={saveLoading}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
             >
-              {loading ? 'Saving...' : 'Save Job'}
+              {saveLoading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
