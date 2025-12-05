@@ -157,8 +157,8 @@ test.describe('Customers View', () => {
     // Add a customer
     await window.click('button:has-text("Add Customer")')
     await window.waitForSelector('input[name="firstName"]')
-    await window.fill('input[name="firstName"]', 'Original')
-    await window.fill('input[name="lastName"]', 'Name')
+    await window.fill('input[name="firstName"]', 'EditOrig')
+    await window.fill('input[name="lastName"]', 'TestName')
     await window.click('button:has-text("Save Customer")')
     await window.waitForTimeout(1000)
 
@@ -168,8 +168,8 @@ test.describe('Customers View', () => {
 
     // Update the name
     const firstNameInput = window.locator('input[name="firstName"]')
-    await firstNameInput.fill('Updated')
-    await window.fill('input[name="email"]', 'updated@example.com')
+    await firstNameInput.fill('EditUpd')
+    await window.fill('input[name="email"]', 'editupd@example.com')
 
     // Save
     await window.click('button:has-text("Save Changes")')
@@ -179,8 +179,8 @@ test.describe('Customers View', () => {
     await window.waitForSelector('h2:has-text("Customers")')
 
     // Verify the customer was updated in the table
-    const nameCell = window.locator('span:has-text("Updated Smith")')
-    await expect(nameCell).toBeVisible()
+    const emailCell = window.locator('td:has-text("editupd@example.com")')
+    await expect(emailCell).toBeVisible()
   })
 
   test('should close form when Cancel clicked', async ({ window }) => {

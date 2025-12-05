@@ -32,8 +32,8 @@ test.describe('App UI', () => {
     // Click on Properties tab
     await window.click('button:has-text("Properties")')
 
-    // Verify properties view is shown
-    const propertiesHeading = window.locator('h2:has-text("Properties")')
+    // Verify properties view is shown (properties view has h3 headings)
+    const propertiesHeading = window.locator('h3:has-text("Select a Customer")')
     await expect(propertiesHeading).toBeVisible()
 
     // Click back to Reminders
