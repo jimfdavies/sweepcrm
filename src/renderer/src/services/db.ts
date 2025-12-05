@@ -8,11 +8,17 @@ export const createRecord = async <T extends { id: string }>(
   table: string,
   data: T
 ): Promise<{ id: string }> => {
-  const response = await ipcInvoke<{ success: boolean; data?: { id: string } }>('db:request', {
-    operation: 'create',
-    table,
-    data
-  } as DatabaseRequest)
+  const response = await ipcInvoke<{ success: boolean; data?: { id: string }; error?: string }>(
+    'db:request',
+    {
+      operation: 'create',
+      table,
+      data
+    } as DatabaseRequest
+  )
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to create record')
+  }
   return response.data || { id: '' }
 }
 
@@ -20,11 +26,17 @@ export const createRecord = async <T extends { id: string }>(
  * Read a single record by ID
  */
 export const readRecord = async <T = unknown>(table: string, id: string): Promise<T> => {
-  const response = await ipcInvoke<{ success: boolean; data?: T }>('db:request', {
-    operation: 'read',
-    table,
-    id
-  } as DatabaseRequest)
+  const response = await ipcInvoke<{ success: boolean; data?: T; error?: string }>(
+    'db:request',
+    {
+      operation: 'read',
+      table,
+      id
+    } as DatabaseRequest
+  )
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to read record')
+  }
   return response.data as T
 }
 
@@ -35,12 +47,18 @@ export const updateRecord = async <T extends { id: string }>(
   table: string,
   data: T
 ): Promise<{ id: string }> => {
-  const response = await ipcInvoke<{ success: boolean; data?: { id: string } }>('db:request', {
-    operation: 'update',
-    table,
-    id: data.id,
-    data
-  } as DatabaseRequest)
+  const response = await ipcInvoke<{ success: boolean; data?: { id: string }; error?: string }>(
+    'db:request',
+    {
+      operation: 'update',
+      table,
+      id: data.id,
+      data
+    } as DatabaseRequest
+  )
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to update record')
+  }
   return response.data || { id: '' }
 }
 
@@ -48,11 +66,14 @@ export const updateRecord = async <T extends { id: string }>(
  * Delete a record
  */
 export const deleteRecord = async (table: string, id: string): Promise<void> => {
-  await ipcInvoke('db:request', {
+  const response = await ipcInvoke<{ success: boolean; error?: string }>('db:request', {
     operation: 'delete',
     table,
     id
   } as DatabaseRequest)
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to delete record')
+  }
 }
 
 /**
@@ -62,10 +83,16 @@ export const listRecords = async <T = unknown>(
   table: string,
   filters?: Record<string, unknown>
 ): Promise<T[]> => {
-  const response = await ipcInvoke<{ success: boolean; data?: T[] }>('db:request', {
-    operation: 'list',
-    table,
-    filters
-  } as DatabaseRequest)
+  const response = await ipcInvoke<{ success: boolean; data?: T[]; error?: string }>(
+    'db:request',
+    {
+      operation: 'list',
+      table,
+      filters
+    } as DatabaseRequest
+  )
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to list records')
+  }
   return response.data || []
 }

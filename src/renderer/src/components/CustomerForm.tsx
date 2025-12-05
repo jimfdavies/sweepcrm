@@ -49,12 +49,21 @@ export default function CustomerForm({ onSave, onCancel }: CustomerFormProps) {
       setLoading(true)
       setError(null)
 
-      const newCustomer = {
-        id: generateUUID(),
-        ...formData,
+      // Build customer object with only schema-matching fields
+      const customerId = generateUUID()
+      const newCustomer: Record<string, unknown> & { id: string } = {
+        id: customerId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
+
+      // Add optional fields only if they have values
+      if (formData.phone?.trim()) newCustomer.phone = formData.phone
+      if (formData.email?.trim()) newCustomer.email = formData.email
+      if (formData.notes?.trim()) newCustomer.notes = formData.notes
+      // Note: title is not in the database schema, so we don't include it
 
       await createRecord('customers', newCustomer)
       onSave()
