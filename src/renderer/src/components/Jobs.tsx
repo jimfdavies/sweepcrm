@@ -96,7 +96,7 @@ export default function Jobs() {
 
     try {
       setError(null)
-      const data = await listRecords<ServiceLog>('service_logs', { propertyId: selectedPropertyId })
+      const data = await listRecords<ServiceLog>('serviceLogs', { propertyId: selectedPropertyId })
       // Sort by date descending (most recent first)
       data.sort((a, b) => new Date(b.serviceDate).getTime() - new Date(a.serviceDate).getTime())
       setJobs(data)
