@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { listRecords } from '../services/db'
 import PropertyForm from './PropertyForm'
+import PropertyEditForm from './PropertyEditForm'
 
 interface Customer {
   id: string
@@ -30,6 +31,7 @@ export default function Properties() {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showPropertyForm, setShowPropertyForm] = useState(false)
+  const [editingPropertyId, setEditingPropertyId] = useState<string | null>(null)
 
   useEffect(() => {
     loadCustomers()
@@ -198,7 +200,12 @@ export default function Properties() {
                         {property.lastCleanedDate ? new Date(property.lastCleanedDate).toLocaleDateString() : '-'}
                       </td>
                       <td className="px-4 py-3 text-sm">
-                        <button className="text-blue-600 hover:text-blue-800 font-medium mr-3">Edit</button>
+                        <button
+                          onClick={() => setEditingPropertyId(property.id)}
+                          className="text-blue-600 hover:text-blue-800 font-medium mr-3"
+                        >
+                          Edit
+                        </button>
                         <button className="text-red-600 hover:text-red-800 font-medium">Delete</button>
                       </td>
                     </tr>
@@ -219,6 +226,18 @@ export default function Properties() {
             loadProperties()
           }}
           onCancel={() => setShowPropertyForm(false)}
+        />
+      )}
+
+      {/* Property Edit Form Modal */}
+      {editingPropertyId && (
+        <PropertyEditForm
+          propertyId={editingPropertyId}
+          onSave={() => {
+            setEditingPropertyId(null)
+            loadProperties()
+          }}
+          onCancel={() => setEditingPropertyId(null)}
         />
       )}
     </div>
