@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Reminders from './components/Reminders'
+import Customers from './components/Customers'
 
 type View = 'reminders' | 'customers' | 'properties'
 
@@ -45,12 +46,7 @@ export default function App() {
         <main className="flex-1 p-8">
           <div className="max-w-6xl">
             {currentView === 'reminders' && <Reminders />}
-            {currentView === 'customers' && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Customers</h2>
-                <p className="text-gray-600">Customer management coming soon...</p>
-              </div>
-            )}
+            {currentView === 'customers' && <Customers />}
             {currentView === 'properties' && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Properties</h2>

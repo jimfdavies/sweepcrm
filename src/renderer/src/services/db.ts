@@ -8,24 +8,24 @@ export const createRecord = async <T extends { id: string }>(
   table: string,
   data: T
 ): Promise<{ id: string }> => {
-  const response = await ipcInvoke<{ id: string }>('db:request', {
+  const response = await ipcInvoke<{ success: boolean; data?: { id: string } }>('db:request', {
     operation: 'create',
     table,
     data
   } as DatabaseRequest)
-  return response
+  return response.data || { id: '' }
 }
 
 /**
  * Read a single record by ID
  */
 export const readRecord = async <T = unknown>(table: string, id: string): Promise<T> => {
-  const response = await ipcInvoke<T>('db:request', {
+  const response = await ipcInvoke<{ success: boolean; data?: T }>('db:request', {
     operation: 'read',
     table,
     id
   } as DatabaseRequest)
-  return response
+  return response.data as T
 }
 
 /**
@@ -35,13 +35,13 @@ export const updateRecord = async <T extends { id: string }>(
   table: string,
   data: T
 ): Promise<{ id: string }> => {
-  const response = await ipcInvoke<{ id: string }>('db:request', {
+  const response = await ipcInvoke<{ success: boolean; data?: { id: string } }>('db:request', {
     operation: 'update',
     table,
     id: data.id,
     data
   } as DatabaseRequest)
-  return response
+  return response.data || { id: '' }
 }
 
 /**
@@ -62,10 +62,10 @@ export const listRecords = async <T = unknown>(
   table: string,
   filters?: Record<string, unknown>
 ): Promise<T[]> => {
-  const response = await ipcInvoke<T[]>('db:request', {
+  const response = await ipcInvoke<{ success: boolean; data?: T[] }>('db:request', {
     operation: 'list',
     table,
     filters
   } as DatabaseRequest)
-  return response || []
+  return response.data || []
 }
