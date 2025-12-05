@@ -1,4 +1,17 @@
+import { useState } from 'react'
+import Reminders from './components/Reminders'
+
+type View = 'reminders' | 'customers' | 'properties'
+
 export default function App() {
+  const [currentView, setCurrentView] = useState<View>('reminders')
+
+  const navItems: { id: View; label: string }[] = [
+    { id: 'reminders', label: 'Reminders' },
+    { id: 'customers', label: 'Customers' },
+    { id: 'properties', label: 'Properties' }
+  ]
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -8,14 +21,45 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome</h2>
-          <p className="text-gray-700">
-            Application is starting up. Configure navigation and data entry forms here.
-          </p>
-        </div>
-      </main>
+      <div className="flex">
+        {/* Sidebar Navigation */}
+        <aside className="w-64 bg-white shadow">
+          <nav className="p-6 space-y-2">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setCurrentView(item.id)}
+                className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentView === item.id
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-8">
+          <div className="max-w-6xl">
+            {currentView === 'reminders' && <Reminders />}
+            {currentView === 'customers' && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Customers</h2>
+                <p className="text-gray-600">Customer management coming soon...</p>
+              </div>
+            )}
+            {currentView === 'properties' && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Properties</h2>
+                <p className="text-gray-600">Property management coming soon...</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

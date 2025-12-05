@@ -8,7 +8,30 @@ import typescriptParser from '@typescript-eslint/parser'
 export default [
   { ignores: ['dist', 'out', 'node_modules'] },
   {
-    files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
+    files: ['src/main/**/*.{js,ts}', 'src/preload/**/*.{js,ts}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'module',
+      globals: { ...globals.node, Electron: 'readonly', NodeJS: 'readonly' },
+      parser: typescriptParser
+    },
+    plugins: {
+      '@typescript-eslint': typescript
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ]
+    }
+  },
+  {
+    files: ['src/renderer/**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
@@ -28,7 +51,20 @@ export default [
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off'
+      'react/prop-types': 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ]
+    },
+    settings: {
+      react: {
+        version: 'detect'
+      }
     }
   }
 ]

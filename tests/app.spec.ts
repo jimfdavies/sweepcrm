@@ -21,8 +21,8 @@ test.describe('Electron App', () => {
     const heading = window.locator('h1')
     await expect(heading).toContainText('SweepCRM')
 
-    // Look for the subheading with specific class
-    const subheading = window.locator('p.text-gray-600')
+    // Look for the subheading in the header
+    const subheading = window.locator('header p.text-gray-600')
     await expect(subheading).toContainText('Chimney Sweep')
   })
 
