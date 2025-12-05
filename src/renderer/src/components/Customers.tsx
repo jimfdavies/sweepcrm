@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { listRecords } from '../services/db'
+import CustomerForm from './CustomerForm'
 
 interface Customer {
   id: string
@@ -17,6 +18,7 @@ export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
     loadCustomers()
@@ -63,13 +65,17 @@ export default function Customers() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Customers</h2>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-          Add Customer
-        </button>
-      </div>
+    <>
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Customers</h2>
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+          >
+            Add Customer
+          </button>
+        </div>
 
       {customers.length === 0 ? (
         <div className="text-center py-12">
@@ -112,6 +118,17 @@ export default function Customers() {
           </table>
         </div>
       )}
-    </div>
+      </div>
+
+      {showForm && (
+        <CustomerForm
+          onSave={() => {
+            setShowForm(false)
+            loadCustomers()
+          }}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
+    </>
   )
 }
