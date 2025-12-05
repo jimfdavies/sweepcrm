@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { listRecords } from '../services/db'
+import JobForm from './JobForm'
 
 interface Customer {
   id: string
@@ -41,6 +42,7 @@ export default function Jobs() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [customerSearchQuery, setCustomerSearchQuery] = useState('')
+  const [showJobForm, setShowJobForm] = useState(false)
 
   useEffect(() => {
     loadCustomers()
@@ -230,9 +232,17 @@ export default function Jobs() {
       {/* Jobs Panel */}
       {selectedProperty && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Jobs for {selectedProperty.address}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Jobs for {selectedProperty.address}
+            </h3>
+            <button
+              onClick={() => setShowJobForm(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            >
+              Add Job
+            </button>
+          </div>
 
           {jobs.length === 0 ? (
             <div className="text-center py-8">
@@ -273,6 +283,18 @@ export default function Jobs() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Job Form Modal */}
+      {showJobForm && selectedPropertyId && (
+        <JobForm
+          propertyId={selectedPropertyId}
+          onSave={() => {
+            setShowJobForm(false)
+            loadJobs()
+          }}
+          onCancel={() => setShowJobForm(false)}
+        />
       )}
     </div>
   )
