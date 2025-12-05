@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { listRecords } from '../services/db'
+import PropertyForm from './PropertyForm'
 
 interface Customer {
   id: string
@@ -28,6 +29,7 @@ export default function Properties() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showPropertyForm, setShowPropertyForm] = useState(false)
 
   useEffect(() => {
     loadCustomers()
@@ -157,9 +159,17 @@ export default function Properties() {
       {/* Properties Panel */}
       {selectedCustomer && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Properties for {selectedCustomer.firstName} {selectedCustomer.lastName}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Properties for {selectedCustomer.firstName} {selectedCustomer.lastName}
+            </h3>
+            <button
+              onClick={() => setShowPropertyForm(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            >
+              Add Property
+            </button>
+          </div>
 
           {properties.length === 0 ? (
             <div className="text-center py-8">
@@ -198,6 +208,18 @@ export default function Properties() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Property Form Modal */}
+      {showPropertyForm && selectedCustomerId && (
+        <PropertyForm
+          customerId={selectedCustomerId}
+          onSave={() => {
+            setShowPropertyForm(false)
+            loadProperties()
+          }}
+          onCancel={() => setShowPropertyForm(false)}
+        />
       )}
     </div>
   )
