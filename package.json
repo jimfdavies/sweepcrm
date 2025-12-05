@@ -6,6 +6,7 @@
   "author": "Jim Davies",
   "license": "MIT",
   "scripts": {
+    "postinstall": "electron-rebuild",
     "dev": "electron-vite dev",
     "build": "npm run type-check && electron-vite build",
     "build:win": "npm run build && electron-builder --win",
@@ -40,6 +41,7 @@
     "autoprefixer": "^10.4.0",
     "electron": "^39.2.5",
     "electron-builder": "^24.6.4",
+    "electron-rebuild": "^3.2.9",
     "electron-vite": "^2.0.0",
     "eslint": "^8.50.0",
     "eslint-plugin-react": "^7.33.0",
