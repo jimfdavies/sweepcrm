@@ -2,8 +2,9 @@ import { useState } from 'react'
 import Reminders from './components/Reminders'
 import Customers from './components/Customers'
 import Properties from './components/Properties'
+import Jobs from './components/Jobs'
 
-type View = 'reminders' | 'customers' | 'properties'
+type View = 'reminders' | 'customers' | 'properties' | 'jobs'
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('reminders')
@@ -11,7 +12,8 @@ export default function App() {
   const navItems: { id: View; label: string }[] = [
     { id: 'reminders', label: 'Reminders' },
     { id: 'customers', label: 'Customers' },
-    { id: 'properties', label: 'Properties' }
+    { id: 'properties', label: 'Properties' },
+    { id: 'jobs', label: 'Jobs' }
   ]
 
   return (
@@ -49,6 +51,7 @@ export default function App() {
             {currentView === 'reminders' && <Reminders />}
             {currentView === 'customers' && <Customers />}
             {currentView === 'properties' && <Properties />}
+            {currentView === 'jobs' && <Jobs />}
           </div>
         </main>
       </div>
