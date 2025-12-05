@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { listRecords } from '../services/db'
 import CustomerForm from './CustomerForm'
+import CustomerEditForm from './CustomerEditForm'
 
 interface Customer {
   id: string
@@ -19,6 +20,7 @@ export default function Customers() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null)
 
   useEffect(() => {
     loadCustomers()
@@ -107,7 +109,10 @@ export default function Customers() {
                   <td className="px-4 py-3 text-sm text-gray-600">{customer.phone || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{customer.email || '-'}</td>
                   <td className="px-4 py-3 text-sm">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium mr-3">
+                    <button
+                      onClick={() => setEditingCustomerId(customer.id)}
+                      className="text-blue-600 hover:text-blue-800 font-medium mr-3"
+                    >
                       Edit
                     </button>
                     <button className="text-red-600 hover:text-red-800 font-medium">Delete</button>
@@ -127,6 +132,17 @@ export default function Customers() {
             loadCustomers()
           }}
           onCancel={() => setShowForm(false)}
+        />
+      )}
+
+      {editingCustomerId && (
+        <CustomerEditForm
+          customerId={editingCustomerId}
+          onSave={() => {
+            setEditingCustomerId(null)
+            loadCustomers()
+          }}
+          onCancel={() => setEditingCustomerId(null)}
         />
       )}
     </>
