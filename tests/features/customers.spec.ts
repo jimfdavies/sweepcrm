@@ -260,4 +260,192 @@ test.describe('Customers View', () => {
     // Take screenshot
     await window.screenshot({ path: 'tests/screenshots/customer-edit-form.png' })
   })
+
+  test('should display search box when customers exist', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add a customer first
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'Test')
+    await window.fill('input[name="lastName"]', 'User')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(500)
+
+    // Verify search input is visible
+    const searchInput = window.locator('input[placeholder*="Search by"]')
+    await expect(searchInput).toBeVisible()
+  })
+
+  test('should filter customers by first name', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add two customers
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'FilterAlice')
+    await window.fill('input[name="lastName"]', 'Smith')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(500)
+
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'FilterBob')
+    await window.fill('input[name="lastName"]', 'Jones')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(500)
+
+    // Search for FilterAlice
+    const searchInput = window.locator('input[placeholder*="Search by"]')
+    await searchInput.fill('FilterAlice')
+
+    // Should see FilterAlice but not FilterBob
+    const aliceCell = window.locator('span:has-text("FilterAlice Smith")')
+    const bobCell = window.locator('span:has-text("FilterBob Jones")')
+    await expect(aliceCell).toBeVisible()
+    await expect(bobCell).not.toBeVisible()
+  })
+
+  test('should filter customers by email', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add a customer with email
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'TestEmail')
+    await window.fill('input[name="lastName"]', 'User')
+    await window.fill('input[name="email"]', 'testemail@example.com')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(1000)
+
+    // Wait for form to close and table to be visible
+    await window.waitForSelector('table')
+
+    // Search for email
+    const searchInput = window.locator('input[placeholder*="Search by"]')
+    await searchInput.fill('testemail@example')
+
+    // Should find the customer (check if table row contains the email)
+    await expect(window.locator('td:has-text("testemail@example.com")')).toBeVisible()
+  })
+
+  test('should filter customers by phone', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add a customer with phone
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'PhoneFilter')
+    await window.fill('input[name="lastName"]', 'User')
+    await window.fill('input[name="phone"]', '020 1234 5678')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(500)
+
+    // Search for phone
+    const searchInput = window.locator('input[placeholder*="Search by"]')
+    await searchInput.fill('020 1234')
+
+    // Should find the customer
+    const nameCell = window.locator('span:has-text("PhoneFilter User")')
+    await expect(nameCell).toBeVisible()
+  })
+
+  test('should show no results message when search has no matches', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add a customer
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'John')
+    await window.fill('input[name="lastName"]', 'Smith')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(500)
+
+    // Search for something that doesn't match
+    const searchInput = window.locator('input[placeholder*="Search by"]')
+    await searchInput.fill('nonexistent')
+
+    // Should see no results message
+    await expect(window.locator('text=No results match your search')).toBeVisible()
+    
+    // Customer should not be visible
+    await expect(window.locator('text=John Smith')).not.toBeVisible()
+  })
+
+  test('should show result count when searching', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add a customer
+    await window.click('button:has-text("Add Customer")')
+    await window.waitForSelector('input[name="firstName"]')
+    await window.fill('input[name="firstName"]', 'ResultCount')
+    await window.fill('input[name="lastName"]', 'Test')
+    await window.click('button:has-text("Save Customer")')
+    await window.waitForTimeout(1000)
+
+    // Wait for form to close
+    await window.waitForSelector('table')
+
+    // Search
+    const searchInput = window.locator('input[placeholder*="Search by"]')
+    await searchInput.fill('ResultCount')
+
+    // Should show result count (matches "Found X of Y")
+    const resultText = window.locator('text=/Found .* of/')
+    await expect(resultText).toBeVisible()
+  })
+
+  test('should clear search when input is cleared', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Check if there are customers
+    const table = window.locator('table')
+    const tableVisible = await table.count() > 0
+
+    if (tableVisible) {
+      // Search then clear
+      const searchInput = window.locator('input[placeholder*="Search by"]')
+      await searchInput.fill('xyz')
+      await window.waitForTimeout(300)
+
+      // Verify no results message appears
+      await expect(window.locator('text=No results match your search')).toBeVisible()
+
+      // Clear search
+      await searchInput.fill('')
+      await window.waitForTimeout(300)
+
+      // Should see "No results" disappear
+      await expect(window.locator('text=No results match your search')).not.toBeVisible()
+      
+      // Result count should not be shown when empty
+      const resultCountText = window.locator('text=/Found .* of/')
+      await expect(resultCountText).not.toBeVisible()
+    }
+  })
+
+  test('should take screenshot of customer search UI', async ({ window }) => {
+    // Navigate to customers
+    await window.click('button:has-text("Customers")')
+
+    // Add a few customers
+    for (let i = 0; i < 3; i++) {
+      await window.click('button:has-text("Add Customer")')
+      await window.waitForSelector('input[name="firstName"]')
+      await window.fill('input[name="firstName"]', `Customer${i}`)
+      await window.fill('input[name="lastName"]', `Test${i}`)
+      await window.click('button:has-text("Save Customer")')
+      await window.waitForTimeout(300)
+    }
+
+    // Take screenshot
+    await window.screenshot({ path: 'tests/screenshots/customer-search.png' })
+  })
 })

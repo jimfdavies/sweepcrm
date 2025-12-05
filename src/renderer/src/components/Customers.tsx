@@ -21,6 +21,7 @@ export default function Customers() {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     loadCustomers()
@@ -39,6 +40,17 @@ export default function Customers() {
       setLoading(false)
     }
   }
+
+  const filteredCustomers = customers.filter((customer) => {
+    const query = searchQuery.toLowerCase()
+    const fullName = `${customer.firstName} ${customer.lastName}`.toLowerCase()
+    return (
+      fullName.includes(query) ||
+      customer.phone?.toLowerCase().includes(query) ||
+      customer.email?.toLowerCase().includes(query) ||
+      customer.title?.toLowerCase().includes(query)
+    )
+  })
 
   if (loading) {
     return (
@@ -79,12 +91,34 @@ export default function Customers() {
           </button>
         </div>
 
-      {customers.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">No customers found</p>
-          <p className="text-gray-500 text-sm mt-2">Start by adding your first customer</p>
-        </div>
-      ) : (
+        {customers.length > 0 && (
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="Search by name, phone, email, or title..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {searchQuery && (
+              <p className="mt-2 text-sm text-gray-600">
+                Found {filteredCustomers.length} of {customers.length} customer{customers.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+        )}
+
+      {filteredCustomers.length === 0 && customers.length === 0 ? (
+         <div className="text-center py-12">
+           <p className="text-gray-600 text-lg">No customers found</p>
+           <p className="text-gray-500 text-sm mt-2">Start by adding your first customer</p>
+         </div>
+       ) : filteredCustomers.length === 0 ? (
+         <div className="text-center py-12">
+           <p className="text-gray-600 text-lg">No results match your search</p>
+           <p className="text-gray-500 text-sm mt-2">Try adjusting your search terms</p>
+         </div>
+       ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -96,7 +130,7 @@ export default function Customers() {
               </tr>
             </thead>
             <tbody>
-              {customers.map((customer) => (
+              {filteredCustomers.map((customer) => (
                 <tr
                   key={customer.id}
                   className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
