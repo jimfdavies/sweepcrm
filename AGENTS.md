@@ -62,7 +62,7 @@ bd close bd-42 --reason "Completed" --json
     - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
 5. **Before closing**: ALWAYS ask user for manual testing approval:
     - Tell user what to look for (specific UI elements, interactions, edge cases)
-    - Ask them to test the feature using `npm run test:e2e:ui`
+    - Ask them to test the feature using `npm run uat`
     - Wait for feedback/approval before closing the issue
     - Update issue close reason with user feedback
 6. **Complete**: `bd close <id> --reason "Done + user feedback"`
