@@ -35,6 +35,16 @@ export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) 
     }))
   }
 
+  const set12MonthsAgo = () => {
+    const date = new Date()
+    date.setFullYear(date.getFullYear() - 1)
+    const formattedDate = date.toISOString().split('T')[0]
+    setFormData((prev) => ({
+      ...prev,
+      serviceDate: formattedDate
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -100,15 +110,24 @@ export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) 
             <label htmlFor="serviceDate" className="block text-sm font-medium text-gray-700 mb-1">
               Service Date *
             </label>
-            <input
-              type="date"
-              id="serviceDate"
-              name="serviceDate"
-              value={formData.serviceDate}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="flex gap-2">
+              <input
+                type="date"
+                id="serviceDate"
+                name="serviceDate"
+                value={formData.serviceDate}
+                onChange={handleChange}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <button
+                type="button"
+                onClick={set12MonthsAgo}
+                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium text-sm whitespace-nowrap"
+              >
+                -12m
+              </button>
+            </div>
           </div>
 
           {/* Service Type */}
