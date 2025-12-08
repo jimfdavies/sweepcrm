@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { listRecords } from '../services/db'
+import { listRecords, deleteRecord } from '../services/db'
 import JobForm from './JobForm'
 import JobEditForm from './JobEditForm'
 
@@ -107,6 +107,22 @@ export default function Jobs() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load jobs')
       console.error('Error loading jobs:', err)
+    }
+  }
+
+  const handleDeleteJob = async (jobId: string, serviceDate: string, serviceType: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete the ${serviceType} job from ${new Date(serviceDate).toLocaleDateString()}?`
+    )
+    if (!confirmed) return
+
+    try {
+      setError(null)
+      await deleteRecord('serviceLogs', jobId)
+      loadJobs()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete job')
+      console.error('Error deleting job:', err)
     }
   }
 
@@ -281,7 +297,12 @@ export default function Jobs() {
                         >
                           Edit
                         </button>
-                        <button className="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                        <button
+                          onClick={() => handleDeleteJob(job.id, job.serviceDate, job.serviceType)}
+                          className="text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}

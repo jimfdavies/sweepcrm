@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { listRecords } from '../services/db'
+import { listRecords, deleteRecord } from '../services/db'
 import PropertyForm from './PropertyForm'
 import PropertyEditForm from './PropertyEditForm'
 
@@ -70,6 +70,22 @@ export default function Properties() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load properties')
       console.error('Error loading properties:', err)
+    }
+  }
+
+  const handleDeleteProperty = async (propertyId: string, propertyAddress: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${propertyAddress}? This will also delete all jobs for this property.`
+    )
+    if (!confirmed) return
+
+    try {
+      setError(null)
+      await deleteRecord('properties', propertyId)
+      loadProperties()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete property')
+      console.error('Error deleting property:', err)
     }
   }
 
@@ -206,7 +222,12 @@ export default function Properties() {
                         >
                           Edit
                         </button>
-                        <button className="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                        <button
+                          onClick={() => handleDeleteProperty(property.id, property.address)}
+                          className="text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}

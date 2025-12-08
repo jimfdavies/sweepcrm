@@ -1,15 +1,17 @@
 import { useState } from 'react'
+import Home from './components/Home'
 import Reminders from './components/Reminders'
 import Customers from './components/Customers'
 import Properties from './components/Properties'
 import Jobs from './components/Jobs'
 
-type View = 'reminders' | 'customers' | 'properties' | 'jobs'
+type View = 'home' | 'reminders' | 'customers' | 'properties' | 'jobs'
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<View>('reminders')
+  const [currentView, setCurrentView] = useState<View>('home')
 
   const navItems: { id: View; label: string }[] = [
+    { id: 'home', label: 'Home' },
     { id: 'reminders', label: 'Reminders' },
     { id: 'customers', label: 'Customers' },
     { id: 'properties', label: 'Properties' },
@@ -42,12 +44,21 @@ export default function App() {
                 {item.label}
               </button>
             ))}
+            <div className="pt-4 mt-4 border-t border-gray-200">
+              <button
+                onClick={() => setCurrentView('jobs')}
+                className="w-full bg-green-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors"
+              >
+                + Add Job Details
+              </button>
+            </div>
           </nav>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 p-8">
           <div className="max-w-6xl">
+            {currentView === 'home' && <Home />}
             {currentView === 'reminders' && <Reminders />}
             {currentView === 'customers' && <Customers />}
             {currentView === 'properties' && <Properties />}

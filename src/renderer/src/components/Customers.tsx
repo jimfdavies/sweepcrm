@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { listRecords } from '../services/db'
+import { listRecords, deleteRecord } from '../services/db'
 import CustomerForm from './CustomerForm'
 import CustomerEditForm from './CustomerEditForm'
 
@@ -38,6 +38,21 @@ export default function Customers() {
       console.error('Error loading customers:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteCustomer = async (customerId: string, customerName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${customerName}? This will also delete all their properties and jobs.`
+    )
+    if (!confirmed) return
+
+    try {
+      await deleteRecord('customers', customerId)
+      loadCustomers()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete customer')
+      console.error('Error deleting customer:', err)
     }
   }
 
@@ -149,7 +164,12 @@ export default function Customers() {
                     >
                       Edit
                     </button>
-                    <button className="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                    <button
+                      onClick={() => handleDeleteCustomer(customer.id, `${customer.firstName} ${customer.lastName}`)}
+                      className="text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
