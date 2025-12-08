@@ -19,7 +19,7 @@ interface JobFormProps {
 export default function JobForm({ propertyId, onSave, onCancel }: JobFormProps) {
   const [formData, setFormData] = useState({
     serviceDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-    serviceType: '',
+    serviceType: 'Chimney Sweep',
     cost: '',
     notes: ''
   })
