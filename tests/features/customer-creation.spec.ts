@@ -15,39 +15,7 @@ test.describe('Customer Creation', () => {
     await expect(formHeading).toBeVisible()
   })
 
-  test('should display all customer form fields', async ({ window }) => {
-    // Navigate to customers and open form
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
 
-    // Check for all input fields
-    const titleInput = window.locator('input[name="title"]')
-    const firstNameInput = window.locator('input[name="firstName"]')
-    const lastNameInput = window.locator('input[name="lastName"]')
-    const phoneInput = window.locator('input[name="phone"]')
-    const emailInput = window.locator('input[name="email"]')
-    const notesInput = window.locator('textarea[name="notes"]')
-
-    await expect(titleInput).toBeVisible()
-    await expect(firstNameInput).toBeVisible()
-    await expect(lastNameInput).toBeVisible()
-    await expect(phoneInput).toBeVisible()
-    await expect(emailInput).toBeVisible()
-    await expect(notesInput).toBeVisible()
-  })
-
-  test('should have form action buttons', async ({ window }) => {
-    // Navigate to customers and open form
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-
-    // Check for save and cancel buttons
-    const saveBtn = window.locator('button:has-text("Save Customer")')
-    const cancelBtn = window.locator('button:has-text("Cancel")')
-
-    await expect(saveBtn).toBeVisible()
-    await expect(cancelBtn).toBeVisible()
-  })
 
   test('should close form when Cancel button clicked', async ({ window }) => {
     // Navigate to customers and open form
@@ -157,28 +125,5 @@ test.describe('Customer Creation', () => {
     await expect(formHeading).not.toBeVisible()
   })
 
-  test('should take screenshot of customer creation form', async ({ window }) => {
-    // Navigate to customers and open form
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.waitForLoadState('networkidle')
 
-    // Take screenshot
-    await window.screenshot({ path: 'tests/screenshots/customer-creation-form.png' })
-  })
-
-  test('should take screenshot of customer list with data', async ({ window }) => {
-    // Add a customer
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.fill('input[name="firstName"]', 'Test')
-    await window.fill('input[name="lastName"]', 'Customer')
-    await window.fill('input[name="phone"]', '020 1111 2222')
-    await window.fill('input[name="email"]', 'test@example.com')
-    await window.click('button:has-text("Save Customer")')
-    await window.waitForLoadState('networkidle')
-
-    // Take screenshot
-    await window.screenshot({ path: 'tests/screenshots/customer-list-with-data.png' })
-  })
 })

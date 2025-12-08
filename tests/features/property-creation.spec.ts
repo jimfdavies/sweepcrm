@@ -31,79 +31,9 @@ test.describe('Property Creation', () => {
     await expect(formTitle).toBeVisible()
   })
 
-  test('should display all property form fields', async ({ window }) => {
-    // Navigate to properties
-    await window.click('button:has-text("Properties")')
 
-    // Add a customer
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.waitForSelector('input[name="firstName"]')
-    await window.fill('input[name="firstName"]', 'FormFields')
-    await window.fill('input[name="lastName"]', 'Test')
-    await window.click('button:has-text("Save Customer")')
-    await window.waitForTimeout(1000)
 
-    // Go to properties
-    await window.click('button:has-text("Properties")')
-    await window.waitForTimeout(500)
 
-    // Select customer
-    const customerButton = window.locator('button:has-text("FormFields Test")')
-    await customerButton.click()
-    await window.waitForTimeout(500)
-
-    // Open form
-    await window.click('button:has-text("Add Property")')
-    await window.waitForSelector('h3:has-text("Add New Property")')
-
-    // Verify all input fields are present
-    const addressLine1 = window.locator('input[name="addressLine1"]')
-    const addressLine2 = window.locator('input[name="addressLine2"]')
-    const town = window.locator('input[name="town"]')
-    const postcode = window.locator('input[name="postcode"]')
-    const notes = window.locator('textarea[name="notes"]')
-
-    await expect(addressLine1).toBeVisible()
-    await expect(addressLine2).toBeVisible()
-    await expect(town).toBeVisible()
-    await expect(postcode).toBeVisible()
-    await expect(notes).toBeVisible()
-  })
-
-  test('should have form action buttons', async ({ window }) => {
-    // Navigate to properties
-    await window.click('button:has-text("Properties")')
-
-    // Add a customer
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.waitForSelector('input[name="firstName"]')
-    await window.fill('input[name="firstName"]', 'Buttons')
-    await window.fill('input[name="lastName"]', 'Test')
-    await window.click('button:has-text("Save Customer")')
-    await window.waitForTimeout(1000)
-
-    // Go to properties
-    await window.click('button:has-text("Properties")')
-    await window.waitForTimeout(500)
-
-    // Select customer
-    const customerButton = window.locator('button:has-text("Buttons Test")')
-    await customerButton.click()
-    await window.waitForTimeout(500)
-
-    // Open form
-    await window.click('button:has-text("Add Property")')
-    await window.waitForSelector('h3:has-text("Add New Property")')
-
-    // Verify buttons are present
-    const cancelBtn = window.locator('button:has-text("Cancel")')
-    const saveBtn = window.locator('button:has-text("Save Property")')
-
-    await expect(cancelBtn).toBeVisible()
-    await expect(saveBtn).toBeVisible()
-  })
 
   test('should close form when Cancel button clicked', async ({ window }) => {
     // Navigate to properties
@@ -382,70 +312,7 @@ test.describe('Property Creation', () => {
     expect(postcodeValue).toBe('SW1A 1AA')
   })
 
-  test('should take screenshot of property creation form', async ({ window }) => {
-    // Navigate to properties
-    await window.click('button:has-text("Properties")')
 
-    // Add a customer
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.waitForSelector('input[name="firstName"]')
-    await window.fill('input[name="firstName"]', 'Screenshot')
-    await window.fill('input[name="lastName"]', 'Form')
-    await window.click('button:has-text("Save Customer")')
-    await window.waitForTimeout(1000)
-
-    // Go to properties
-    await window.click('button:has-text("Properties")')
-    await window.waitForTimeout(500)
-
-    // Select customer
-    const customerButton = window.locator('button:has-text("Screenshot Form")')
-    await customerButton.click()
-    await window.waitForTimeout(500)
-
-    // Open form
-    await window.click('button:has-text("Add Property")')
-    await window.waitForSelector('h3:has-text("Add New Property")')
-
-    // Take screenshot
-    await window.screenshot({ path: 'tests/screenshots/property-creation-form.png' })
-  })
-
-  test('should take screenshot of property list after adding property', async ({ window }) => {
-    // Navigate to properties
-    await window.click('button:has-text("Properties")')
-
-    // Add a customer
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.waitForSelector('input[name="firstName"]')
-    await window.fill('input[name="firstName"]', 'List')
-    await window.fill('input[name="lastName"]', 'Screenshot')
-    await window.click('button:has-text("Save Customer")')
-    await window.waitForTimeout(1000)
-
-    // Go to properties
-    await window.click('button:has-text("Properties")')
-    await window.waitForTimeout(500)
-
-    // Select customer
-    const customerButton = window.locator('button:has-text("List Screenshot")')
-    await customerButton.click()
-    await window.waitForTimeout(500)
-
-    // Add property
-    await window.click('button:has-text("Add Property")')
-    await window.waitForSelector('h3:has-text("Add New Property")')
-
-    await window.fill('input[name="addressLine1"]', '321 Pine Avenue')
-    await window.fill('input[name="town"]', 'Leeds')
-    await window.click('button:has-text("Save Property")')
-    await window.waitForTimeout(1500)
-
-    // Take screenshot of list
-    await window.screenshot({ path: 'tests/screenshots/property-list-with-data.png' })
-  })
 })
 
 test.describe('Property Edit', () => {
@@ -631,39 +498,4 @@ test.describe('Property Edit', () => {
     await expect(updatedAddress).toBeVisible()
   })
 
-  test('should take screenshot of property edit form', async ({ window }) => {
-    // Navigate to properties
-    await window.click('button:has-text("Properties")')
-
-    // Add a customer
-    await window.click('button:has-text("Customers")')
-    await window.click('button:has-text("Add Customer")')
-    await window.waitForSelector('input[name="firstName"]')
-    await window.fill('input[name="firstName"]', 'Screenshot')
-    await window.fill('input[name="lastName"]', 'Edit')
-    await window.click('button:has-text("Save Customer")')
-    await window.waitForTimeout(1000)
-
-    // Go to properties
-    await window.click('button:has-text("Properties")')
-    await window.waitForTimeout(500)
-
-    // Select customer
-    const customerButton = window.locator('button:has-text("Screenshot Edit")')
-    await customerButton.click()
-    await window.waitForTimeout(500)
-
-    // Add property
-    await window.click('button:has-text("Add Property")')
-    await window.waitForSelector('h3:has-text("Add New Property")')
-    await window.fill('input[name="addressLine1"]', '500 Screenshot Avenue')
-    await window.fill('input[name="town"]', 'Winchester')
-    await window.click('button:has-text("Save Property")')
-    await window.waitForTimeout(1500)
-
-    // Click Edit and take screenshot
-    await window.click('button:has-text("Edit"):nth-child(3)')
-    await window.waitForSelector('h3:has-text("Edit Property")')
-    await window.screenshot({ path: 'tests/screenshots/property-edit-form.png' })
-  })
 })

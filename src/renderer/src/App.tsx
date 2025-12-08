@@ -8,7 +8,7 @@ import Jobs from './components/Jobs'
 type View = 'home' | 'reminders' | 'customers' | 'properties' | 'jobs'
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<View>('home')
+  const [currentView, setCurrentView] = useState<View>('reminders')
 
   const navItems: { id: View; label: string }[] = [
     { id: 'home', label: 'Home' },
