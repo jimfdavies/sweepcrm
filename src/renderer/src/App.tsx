@@ -43,16 +43,8 @@ export default function App() {
               >
                 {item.label}
               </button>
-            ))}
-            <div className="pt-4 mt-4 border-t border-gray-200">
-              <button
-                onClick={() => setCurrentView('jobs')}
-                className="w-full bg-green-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors"
-              >
-                + Add Job Details
-              </button>
-            </div>
-          </nav>
+              ))}
+              </nav>
         </aside>
 
         {/* Main Content */}

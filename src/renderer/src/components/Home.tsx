@@ -125,17 +125,14 @@ export default function Home({ onNavigate }: HomeProps) {
         )}
       </div>
 
-      {/* Quick Links */}
+      {/* Help Text */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <p className="text-sm text-gray-600">
-            Use the navigation menu to browse customers, properties, jobs, and reminders.
-          </p>
-          <p className="text-sm text-gray-600">
-            Click "Add Job Details" to enter new job information from your paper sheets.
-          </p>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Getting Started</h3>
+        <p className="text-gray-600">
+          Use the navigation menu to manage your business: add and track customers, properties, and jobs. 
+          Start by creating customers, then link properties to them, and log service jobs for each property. 
+          Use Reminders to see which properties are due for service.
+        </p>
       </div>
     </div>
   )

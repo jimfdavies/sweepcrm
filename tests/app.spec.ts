@@ -26,10 +26,6 @@ test.describe('SweepCRM App', () => {
     await window.waitForSelector('text=Jobs')
   })
 
-  test('should have Add Job Details button', async ({ window }) => {
-    await expect(window.locator('button:has-text("Add Job Details")')).toBeVisible()
-  })
-
   test('should create and list customer', async ({ window }) => {
     await window.click('button:has-text("Customers")')
     await window.waitForSelector('text=Customers')
