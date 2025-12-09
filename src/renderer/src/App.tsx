@@ -58,7 +58,7 @@ export default function App() {
         {/* Main Content */}
         <main className="flex-1 p-8">
           <div className="max-w-6xl">
-            {currentView === 'home' && <Home />}
+            {currentView === 'home' && <Home onNavigate={setCurrentView} />}
             {currentView === 'reminders' && <Reminders />}
             {currentView === 'customers' && <Customers />}
             {currentView === 'properties' && <Properties />}

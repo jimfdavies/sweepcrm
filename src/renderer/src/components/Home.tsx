@@ -7,7 +7,13 @@ interface EntityCounts {
   jobs: number
 }
 
-export default function Home() {
+type View = 'customers' | 'properties' | 'jobs'
+
+interface HomeProps {
+  onNavigate: (view: View) => void
+}
+
+export default function Home({ onNavigate }: HomeProps) {
   const [counts, setCounts] = useState<EntityCounts>({
     customers: 0,
     properties: 0,
@@ -69,7 +75,10 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Customers Card */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+            <button
+              onClick={() => onNavigate('customers')}
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200 hover:shadow-lg hover:from-blue-100 hover:to-blue-150 transition-all text-left"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-600 uppercase tracking-wide">
@@ -79,10 +88,13 @@ export default function Home() {
                 </div>
                 <div className="text-5xl text-blue-300 opacity-50">👥</div>
               </div>
-            </div>
+            </button>
 
             {/* Properties Card */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+            <button
+              onClick={() => onNavigate('properties')}
+              className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200 hover:shadow-lg hover:from-green-100 hover:to-green-150 transition-all text-left"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-600 uppercase tracking-wide">
@@ -92,10 +104,13 @@ export default function Home() {
                 </div>
                 <div className="text-5xl text-green-300 opacity-50">🏠</div>
               </div>
-            </div>
+            </button>
 
             {/* Jobs Card */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+            <button
+              onClick={() => onNavigate('jobs')}
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200 hover:shadow-lg hover:from-purple-100 hover:to-purple-150 transition-all text-left"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-600 uppercase tracking-wide">
@@ -105,7 +120,7 @@ export default function Home() {
                 </div>
                 <div className="text-5xl text-purple-300 opacity-50">📋</div>
               </div>
-            </div>
+            </button>
           </div>
         )}
       </div>
