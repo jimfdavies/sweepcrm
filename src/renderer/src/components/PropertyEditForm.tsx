@@ -3,16 +3,14 @@ import { readRecord, updateRecord } from '../services/db'
 import { validateAndFormatPostcode } from '../utils/postcodeValidator'
 
 interface Property {
-  id: string
-  customerId: string
-  address: string
-  squareFeet?: number
-  chimneyCount: number
-  lastCleanedDate?: string
-  notes?: string
-  createdAt: string
-  updatedAt: string
-}
+   id: string
+   customerId: string
+   address: string
+   lastCleanedDate?: string
+   notes?: string
+   createdAt: string
+   updatedAt: string
+ }
 
 interface PropertyEditFormProps {
   propertyId: string

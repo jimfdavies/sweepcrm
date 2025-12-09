@@ -12,16 +12,26 @@ interface Customer {
 }
 
 interface Property {
-  id: string
-  customerId: string
-  address: string
-  squareFeet?: number
-  chimneyCount?: number
-  lastCleanedDate?: string
-  notes?: string
-  createdAt: string
-  updatedAt: string
-}
+   id: string
+   customerId: string
+   address: string
+   lastCleanedDate?: string
+   notes?: string
+   createdAt: string
+   updatedAt: string
+ }
+
+ interface ServiceLog {
+   id: string
+   propertyId: string
+   serviceDate: string
+   serviceType?: string
+   certificateNumber?: string
+   cost?: number
+   notes?: string
+   createdAt: string
+   updatedAt: string
+ }
 
 export default function Properties() {
   const [customers, setCustomers] = useState<Customer[]>([])
@@ -65,8 +75,25 @@ export default function Properties() {
 
     try {
       setError(null)
-      const data = await listRecords<Property>('properties', { customerId: selectedCustomerId })
-      setProperties(data)
+      const properties = await listRecords<Property>('properties', { customerId: selectedCustomerId })
+      const serviceLogs = await listRecords<ServiceLog>('serviceLogs')
+
+      // Build a map of propertyId -> most recent serviceDate
+      const lastCleanedMap = new Map<string, string>()
+      for (const log of serviceLogs) {
+        const currentDate = lastCleanedMap.get(log.propertyId)
+        if (!currentDate || new Date(log.serviceDate) > new Date(currentDate)) {
+          lastCleanedMap.set(log.propertyId, log.serviceDate)
+        }
+      }
+
+      // Update properties with last cleaned date
+      const enrichedProperties = properties.map((property) => ({
+        ...property,
+        lastCleanedDate: lastCleanedMap.get(property.id)
+      }))
+
+      setProperties(enrichedProperties)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load properties')
       console.error('Error loading properties:', err)
@@ -200,8 +227,6 @@ export default function Properties() {
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Address</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Sq Ft</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Chimneys</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Last Cleaned</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
                   </tr>
@@ -209,12 +234,10 @@ export default function Properties() {
                 <tbody>
                   {properties.map((property) => (
                     <tr key={property.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">{property.address}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{property.squareFeet?.toLocaleString() || '-'}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{property.chimneyCount || '-'}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {property.lastCleanedDate ? new Date(property.lastCleanedDate).toLocaleDateString() : '-'}
-                      </td>
+                       <td className="px-4 py-3 text-sm text-gray-900 font-medium">{property.address}</td>
+                       <td className="px-4 py-3 text-sm text-gray-600">
+                         {property.lastCleanedDate ? new Date(property.lastCleanedDate).toLocaleDateString() : '-'}
+                       </td>
                       <td className="px-4 py-3 text-sm">
                         <button
                           onClick={() => setEditingPropertyId(property.id)}

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { listRecords, deleteRecord } from '../services/db'
 import JobForm from './JobForm'
 import JobEditForm from './JobEditForm'
+import CustomerForm from './CustomerForm'
+import PropertyForm from './PropertyForm'
 
 interface Customer {
   id: string
@@ -43,8 +45,10 @@ export default function Jobs() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [customerSearchQuery, setCustomerSearchQuery] = useState('')
-  const [showJobForm, setShowJobForm] = useState(false)
-  const [editingJobId, setEditingJobId] = useState<string | null>(null)
+   const [showJobForm, setShowJobForm] = useState(false)
+   const [editingJobId, setEditingJobId] = useState<string | null>(null)
+   const [showCustomerForm, setShowCustomerForm] = useState(false)
+   const [showPropertyForm, setShowPropertyForm] = useState(false)
 
   useEffect(() => {
     loadCustomers()
@@ -165,10 +169,18 @@ export default function Jobs() {
     <div className="space-y-6">
       {/* Customer Selection Panel */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select a Customer</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Select a Customer</h3>
+          <button
+            onClick={() => setShowCustomerForm(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+          >
+            Create Customer
+          </button>
+        </div>
 
         {customers.length === 0 ? (
-          <p className="text-gray-600">No customers found. Add a customer first.</p>
+          <p className="text-gray-600">No customers found. Create one to get started.</p>
         ) : (
           <>
             {/* Search */}
@@ -218,14 +230,22 @@ export default function Jobs() {
       {/* Property Selection Panel */}
       {selectedCustomer && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Properties for {selectedCustomer.firstName} {selectedCustomer.lastName}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Properties for {selectedCustomer.firstName} {selectedCustomer.lastName}
+            </h3>
+            <button
+              onClick={() => setShowPropertyForm(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+            >
+              Create Property
+            </button>
+          </div>
 
           {properties.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600 text-lg">No properties found</p>
-              <p className="text-gray-500 text-sm mt-2">Add a property for this customer first</p>
+              <p className="text-gray-500 text-sm mt-2">Create one to add jobs for this customer</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -336,6 +356,29 @@ export default function Jobs() {
           onCancel={() => setEditingJobId(null)}
         />
       )}
-    </div>
-  )
-}
+
+      {/* Customer Creation Form Modal */}
+      {showCustomerForm && (
+        <CustomerForm
+          onSave={() => {
+            setShowCustomerForm(false)
+            loadCustomers()
+          }}
+          onCancel={() => setShowCustomerForm(false)}
+        />
+      )}
+
+      {/* Property Creation Form Modal */}
+      {showPropertyForm && selectedCustomerId && (
+        <PropertyForm
+          customerId={selectedCustomerId}
+          onSave={() => {
+            setShowPropertyForm(false)
+            loadProperties()
+          }}
+          onCancel={() => setShowPropertyForm(false)}
+        />
+      )}
+      </div>
+      )
+      }

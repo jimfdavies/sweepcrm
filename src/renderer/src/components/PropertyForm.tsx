@@ -98,15 +98,14 @@ export default function PropertyForm({ customerId, onSave, onCancel }: PropertyF
       const address = addressParts.join(', ')
 
       // Create property object
-      const propertyId = generateUUID()
-      const newProperty: Record<string, unknown> & { id: string } = {
-        id: propertyId,
-        customerId,
-        address,
-        chimneyCount: 0, // Default value
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+       const propertyId = generateUUID()
+       const newProperty: Record<string, unknown> & { id: string } = {
+         id: propertyId,
+         customerId,
+         address,
+         createdAt: new Date().toISOString(),
+         updatedAt: new Date().toISOString()
+       }
 
       // Add optional fields only if they have values
       if (formData.notes?.trim()) newProperty.notes = formData.notes
